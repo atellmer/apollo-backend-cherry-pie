@@ -1,0 +1,26 @@
+{
+  "name": "backend-cherry-pie",
+  "version": "0.0.1",
+  "description": "GraphQL-Backend",
+  "author": "AlexPlex",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "npm run build:live",
+    "build:live": "nodemon --exec ts-node -- ./src/server.ts"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "cors": "^2.8.3",
+    "express": "^4.15.2",
+    "graphql": "^0.10.3",
+    "graphql-server-express": "^1.0.0",
+    "graphql-tools": "^1.1.0",
+    "nodemon": "^1.11.0",
+    "ts-node": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.7",
+    "typescript": "^2.4.1"
+  }
+}
