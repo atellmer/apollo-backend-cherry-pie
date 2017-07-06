@@ -5,12 +5,12 @@ import { resolvers } from './resolvers';
 
 const typeDefs = `
   type Channel {
-    id: ID!               
+    id: ID!
     name: String
   }
 
   type Query {
-    channels: [Channel] 
+    channels: [Channel]
   }
 
   type Mutation {
