@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcryptjs';
+import * as passport from 'passport';
 
 
 function genSalt() {
@@ -34,8 +35,13 @@ function comparePasswords(candidatePass, hashPass) {
   });
 }
 
+function protect() {
+  return passport.authenticate('jwt', { session: false });
+}
+
 export {
   genSalt,
   hash,
-  comparePasswords
+  comparePasswords,
+  protect
 }

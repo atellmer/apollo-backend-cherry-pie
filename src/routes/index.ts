@@ -6,13 +6,13 @@ import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import * as User from '../models/user';
 import { User as UserType } from '../types/user';
 import { secretKey } from '../config/init';
-import { comparePasswords } from '../utils/auth';
+import { comparePasswords, protect } from '../utils/auth';
 import { schema } from '../graphql/schema';
 
 
 const router = express.Router();
 
-router.use('/graphql', graphqlExpress({
+router.use('/graphql', protect(), graphqlExpress({
   schema
 }));
 
@@ -69,7 +69,7 @@ router.post('/signin', (req, res, next) => {
 
             res.json({
               success: true,
-              token: `Bearer ${token}`,
+              token: `JWT ${token}`,
               user: {
                 _id: user._id,
                 name: user.name,
@@ -85,6 +85,13 @@ router.post('/signin', (req, res, next) => {
       throw err;
     });
 });
+
+
+router.get('/protect', protect(), (req, res, next) => {
+
+  res.json({ user: req['user']});
+});
+
 
 export {
   router
