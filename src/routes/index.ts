@@ -63,18 +63,19 @@ router.post('/signin', (req, res, next) => {
       comparePasswords(password, user.password)
         .then(isMatch => {
           if (isMatch) {
-            const token = jwt.sign(user, secretKey, {
+            const existUser = {
+              _id: user._id,
+              name: user.name,
+              email: user.email
+            };
+            const token = jwt.sign(existUser, secretKey, {
               expiresIn: 604800
             });
 
             res.json({
               success: true,
               token: `JWT ${token}`,
-              user: {
-                _id: user._id,
-                name: user.name,
-                email: user.email
-              }
+              user: existUser
             });
           } else {
             return res.json({ success: false, msg: 'Wrong email or password' });
@@ -88,7 +89,7 @@ router.post('/signin', (req, res, next) => {
 
 
 router.get('/protect', protect(), (req, res, next) => {
-
+  console.log(req);
   res.json({ user: req['user']});
 });
 

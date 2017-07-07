@@ -16,7 +16,7 @@ function pasportConfigure(passport) {
 
 function jwtInit(options) {
   return new Strategy(options, (jwtPayload, done) => {
-    const { _doc: { _id } } = jwtPayload;
+    const { _id } = jwtPayload;
 
     User.getUserById(_id)
     .then((user: UserType) => {
