@@ -4,7 +4,7 @@ import { genSalt, hash } from '../utils/auth';
 import { User as UserType } from '../types/user';
 
 
-const UserSchema = mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   name: {
     type: String
   },

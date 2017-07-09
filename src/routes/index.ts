@@ -5,7 +5,7 @@ import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 
 import * as User from '../models/user';
 import { User as UserType } from '../types/user';
-import { secretKey } from '../config/init';
+import { port, secretKey } from '../config/init';
 import { comparePasswords, protect } from '../utils/auth';
 import { schema } from '../graphql/schema';
 
@@ -17,7 +17,8 @@ router.use('/graphql', protect(), graphqlExpress({
 }));
 
 router.use('/graphiql', graphiqlExpress({
-  endpointURL: '/graphql'
+  endpointURL: '/graphql',
+  subscriptionsEndpoint: `ws://localhost:${port}/subscriptions`
 }));
 
 router.post('/signup', (req, res, next) => {

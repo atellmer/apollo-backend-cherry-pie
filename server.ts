@@ -1,6 +1,8 @@
+import { createServer } from 'http';
 import { join } from 'path';
-import * as minimist from 'minimist';
 import * as express from 'express';
+import { execute, subscribe } from 'graphql';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import * as passport from 'passport';
@@ -9,41 +11,46 @@ import * as mongoose from 'mongoose';
 import { port, database } from './src/config/init';
 import { pasportConfigure  } from './src/config/passport';
 import { router } from './src/routes';
+import { schema } from './src/graphql/schema';
 
 
 mongoose.Promise = global.Promise;
-const argv = minimist(process.argv.slice(2));
-let PORT = port;
-
-// npm run build:live -- --PORT=5000
-if (argv.PORT) {
-  PORT = parseInt(argv.PORT, 10);
-}
-
 mongoose.connect(database, {
   useMongoClient: true
 });
-mongoose.connection.on('connected', () => {
+
+const db = mongoose.connection;
+
+db.on('connected', () => {
   console.log(`Connected to database: ${database}`);
 });
-mongoose.connection.on('error', err => {
+db.on('error', err => {
   console.log(`Database error: ${err}`);
 });
 
-const app = express();
+const server = express();
 
-app.use(express.static(join(__dirname, 'static')));
-app.use('*', cors());
-app.use(bodyParser.json());
-app.use(passport.initialize());
-app.use(passport.session());
+server.use(express.static(join(__dirname, 'static')));
+server.use('*', cors());
+server.use(bodyParser.json());
+server.use(passport.initialize());
+server.use(passport.session());
 
 pasportConfigure(passport);
 
-app.use('/', router);
+server.use('/', router);
 
-app.get('/', (req, res) => {
-  res.send('hello');
+const ws = createServer(server);
+
+ws.listen(port, () => {
+  const subscriptionServer = new SubscriptionServer({
+    execute,
+    subscribe,
+    schema
+  }, {
+    server: ws,
+    path: '/subscriptions',
+  });
+
+  console.log(`GraphQL Server is now running on http://localhost:${port}`);
 });
-
-app.listen(PORT, () => console.log(`GraphQL Server is now running on http://localhost:${PORT}`));
