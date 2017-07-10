@@ -1,9 +1,6 @@
-import {
-  makeExecutableSchema,
-  addMockFunctionsToSchema,
-} from 'graphql-tools';
+import { makeExecutableSchema } from 'graphql-tools';
 
-import { resolvers } from './resolvers';
+import { userResolvers } from './features/user';
 
 
 const typeDefs = `
@@ -38,6 +35,6 @@ const typeDefs = `
   }
 `;
 
-const schema = makeExecutableSchema({ typeDefs, resolvers });
+const schema = makeExecutableSchema({ typeDefs, resolvers: userResolvers });
 
 export { schema };
