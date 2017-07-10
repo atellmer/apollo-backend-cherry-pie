@@ -28,7 +28,7 @@ let nextMessageId = 5;
 
 const pubsub = new PubSub();
 
-export const resolvers = {
+const userResolvers = {
   Query: {
     channels: () => {
       return channels;
@@ -64,4 +64,8 @@ export const resolvers = {
       }),
     }
   },
+};
+
+export {
+  userResolvers
 };

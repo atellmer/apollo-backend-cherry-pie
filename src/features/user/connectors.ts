@@ -1,10 +1,13 @@
-import * as mongoose from 'mongoose';
+import { Schema, model } from 'mongoose';
 
-import { genSalt, hash } from '../utils/auth';
-import { User as UserType } from '../types/user';
+import {
+  generateSalt,
+  generateHash
+} from '../auth';
+import { UserType } from './types';
 
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Schema({
   name: {
     type: String
   },
@@ -18,11 +21,11 @@ const UserSchema = new mongoose.Schema({
   }
 });
 
-const model = mongoose.model('User', UserSchema);
+const userConnector = model('User', UserSchema);
 
 function getUserById(id: string) {
   return new Promise((resolve, reject) => {
-    model.findById(id, (err: Error, user: UserType) => {
+    userConnector.findById(id, (err: Error, user: UserType) => {
       if (err) {
         reject(err);
       }
@@ -33,7 +36,7 @@ function getUserById(id: string) {
 
 function getUserByEmail(email: string) {
   return new Promise((resolve, reject) => {
-    model.findOne({ email }, (err: Error, user: UserType) => {
+    userConnector.findOne({ email }, (err: Error, user: UserType) => {
       if (err) {
         reject(err);
       }
@@ -44,8 +47,8 @@ function getUserByEmail(email: string) {
 
 function addUser(newUser: any) {
   return new Promise((resolve, reject) => {
-    genSalt()
-    .then((salt: string) => hash(newUser.password, salt))
+    generateSalt()
+    .then((salt: string) => generateHash(newUser.password, salt))
     .then((hashPass: string) => saveUser(newUser, hashPass))
     .then((user: UserType) => {
       resolve(user);
@@ -69,7 +72,7 @@ function saveUser(newUser: any, hashPass: string) {
 }
 
 export {
-  model,
+  userConnector,
   getUserById,
   getUserByEmail,
   addUser

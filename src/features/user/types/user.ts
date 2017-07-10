@@ -1,4 +1,4 @@
-interface User {
+interface UserType {
   _id: string;
   name: string;
   email: string;
@@ -6,5 +6,5 @@ interface User {
 };
 
 export {
-  User
+  UserType
 }

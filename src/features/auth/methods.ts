@@ -1,12 +1,16 @@
-import * as bcrypt from 'bcryptjs';
-import * as passport from 'passport';
-import * as jwt from 'jsonwebtoken';
-import { secretKey } from '../config/init';
+import {
+  genSalt,
+  hash,
+  compare
+} from 'bcryptjs';
+import { authenticate } from 'passport';
+import { verify } from 'jsonwebtoken';
+import { SECRETKEY } from '../../config';
 
 
-function genSalt() {
+function generateSalt() {
   return new Promise((resolve, reject) => {
-    bcrypt.genSalt(10, (err, salt) => {
+    genSalt(10, (err, salt) => {
       if (err) {
         reject(err);
       }
@@ -15,9 +19,9 @@ function genSalt() {
   });
 }
 
-function hash(password, salt) {
+function generateHash(password, salt) {
   return new Promise((resolve, reject) => {
-    bcrypt.hash(password, salt, (err, hashPass) => {
+    hash(password, salt, (err, hashPass) => {
       if (err) {
         reject(err);
       }
@@ -28,7 +32,7 @@ function hash(password, salt) {
 
 function comparePasswords(candidatePass, hashPass) {
   return new Promise((resolve, reject) => {
-    bcrypt.compare(candidatePass, hashPass, (err, isMatch) => {
+    compare(candidatePass, hashPass, (err, isMatch) => {
       if (err) {
         reject(err);
       }
@@ -41,9 +45,9 @@ function validateToken(authToken: string) {
   const promise = new Promise((resolve, reject) => {
     authToken = authToken.replace('JWT', '').trim();
 
-    jwt.verify(authToken, secretKey, (error, decoded) => {
+    verify(authToken, SECRETKEY, (error, decoded) => {
       if (error) {
-        throw new Error(`Decode token error: ${error}`);
+        reject(`decode token error: ${error}`);
       }
 
       resolve(decoded._id);
@@ -54,12 +58,12 @@ function validateToken(authToken: string) {
 }
 
 function protect() {
-  return passport.authenticate('jwt', { session: false });
+  return authenticate('jwt', { session: false });
 }
 
 export {
-  genSalt,
-  hash,
+  generateSalt,
+  generateHash,
   comparePasswords,
   validateToken,
   protect

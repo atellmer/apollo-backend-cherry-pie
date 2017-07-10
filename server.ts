@@ -8,23 +8,22 @@ import * as cors from 'cors';
 import * as passport from 'passport';
 import * as mongoose from 'mongoose';
 
-import { port, database } from './src/config/init';
-import { pasportConfigure  } from './src/config/passport';
-import { router } from './src/routes';
-import { schema } from './src/graphql/schema';
-import { validateToken } from './src/utils/auth';
-import * as User from './src/models/user';
+import { PORT, DB } from './src/config';
+import { configurePassport, validateToken } from './src/features/auth';
+import { router, ROUTES } from './src/routes/main';
+import { schema } from './src/schema';
+import { getUserById } from './src/features/user';
 
 
 mongoose.Promise = global.Promise;
-mongoose.connect(database, {
+mongoose.connect(DB, {
   useMongoClient: true
 });
 
 const db = mongoose.connection;
 
 db.on('connected', () => {
-  console.log(`Connected to database: ${database}`);
+  console.log(`Connected to database: ${DB}`);
 });
 db.on('error', err => {
   console.log(`Database error: ${err}`);
@@ -38,13 +37,13 @@ server.use(bodyParser.json());
 server.use(passport.initialize());
 server.use(passport.session());
 
-pasportConfigure(passport);
+configurePassport(passport);
 
 server.use('/', router);
 
 const websocketServer = createServer(server);
 
-websocketServer.listen(port, () => {
+websocketServer.listen(PORT, () => {
   const subscriptionServer = new SubscriptionServer({
     execute,
     subscribe,
@@ -52,10 +51,9 @@ websocketServer.listen(port, () => {
     onConnect: (connectionParams, webSocket) => {
       if (connectionParams.authToken) {
         return validateToken(connectionParams.authToken)
-          .then((id: string) => User.getUserById(id))
+          .then((id: string) => getUserById(id))
           .then(user => {
             console.log('curren user: ', user);
-
             return {
               currentUser: user,
             };
@@ -66,8 +64,8 @@ websocketServer.listen(port, () => {
   },
   {
     server: websocketServer,
-    path: '/subscriptions',
+    path: ROUTES.WEBSOCKETS,
   });
 
-  console.log(`GraphQL Server is now running on http://localhost:${port}`);
+  console.log(`GraphQL Server is now running on http://localhost:${PORT}`);
 });
