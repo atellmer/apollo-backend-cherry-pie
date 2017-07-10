@@ -1,5 +1,7 @@
 import * as bcrypt from 'bcryptjs';
 import * as passport from 'passport';
+import * as jwt from 'jsonwebtoken';
+import { secretKey } from '../config/init';
 
 
 function genSalt() {
@@ -35,6 +37,22 @@ function comparePasswords(candidatePass, hashPass) {
   });
 }
 
+function validateToken(authToken: string) {
+  const promise = new Promise((resolve, reject) => {
+    authToken = authToken.replace('JWT', '').trim();
+
+    jwt.verify(authToken, secretKey, (error, decoded) => {
+      if (error) {
+        throw new Error(`Decode token error: ${error}`);
+      }
+
+      resolve(decoded._id);
+    });
+  });
+
+  return promise;
+}
+
 function protect() {
   return passport.authenticate('jwt', { session: false });
 }
@@ -43,5 +61,6 @@ export {
   genSalt,
   hash,
   comparePasswords,
+  validateToken,
   protect
 }

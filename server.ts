@@ -12,6 +12,8 @@ import { port, database } from './src/config/init';
 import { pasportConfigure  } from './src/config/passport';
 import { router } from './src/routes';
 import { schema } from './src/graphql/schema';
+import { validateToken } from './src/utils/auth';
+import * as User from './src/models/user';
 
 
 mongoose.Promise = global.Promise;
@@ -40,15 +42,30 @@ pasportConfigure(passport);
 
 server.use('/', router);
 
-const ws = createServer(server);
+const websocketServer = createServer(server);
 
-ws.listen(port, () => {
+websocketServer.listen(port, () => {
   const subscriptionServer = new SubscriptionServer({
     execute,
     subscribe,
-    schema
-  }, {
-    server: ws,
+    schema,
+    onConnect: (connectionParams, webSocket) => {
+      if (connectionParams.authToken) {
+        return validateToken(connectionParams.authToken)
+          .then((id: string) => User.getUserById(id))
+          .then(user => {
+            console.log('curren user: ', user);
+
+            return {
+              currentUser: user,
+            };
+          });
+      }
+      throw new Error('Missing auth token!');
+    }
+  },
+  {
+    server: websocketServer,
     path: '/subscriptions',
   });
 
