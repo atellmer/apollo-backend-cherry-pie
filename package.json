@@ -7,10 +7,9 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "npm run build:live",
-    "build:live": "nodemon --exec ts-node -- ./server.ts"
+    "build:live": "nodemon --exec ts-node -- ./src/server.ts"
   },
   "dependencies": {
-    "@types/graphql": "^0.9.3",
     "@types/node": "^8.0.7",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.17.2",
@@ -26,6 +25,7 @@
     "nodemon": "^1.11.0",
     "passport": "^0.3.2",
     "passport-jwt": "^2.2.1",
+    "ramda": "^0.24.1",
     "subscriptions-transport-ws": "^0.8.0",
     "ts-node": "^3.1.0",
     "tslint": "^5.5.0",

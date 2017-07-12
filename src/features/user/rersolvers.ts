@@ -28,14 +28,7 @@ let nextMessageId = 5;
 
 const pubsub = new PubSub();
 
-const userResolvers = {
-  Subscription: {
-    messageAdded: {
-      subscribe: withFilter(() => pubsub.asyncIterator('messageAdded'), (payload, variables) => {
-        return payload.channelId === variables.channelId;
-      }),
-    }
-  },
+const resolvers = {
   Query: {
     channels: () => {
       return channels;
@@ -63,9 +56,14 @@ const userResolvers = {
 
       return newMessage;
     },
+  },
+  Subscription: {
+    messageAdded: {
+      subscribe: withFilter(() => pubsub.asyncIterator('messageAdded'), (payload, variables) => {
+        return payload.channelId === variables.channelId;
+      })
+    }
   }
 };
 
-export {
-  userResolvers
-};
+export { resolvers };

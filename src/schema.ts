@@ -1,40 +1,18 @@
 import { makeExecutableSchema } from 'graphql-tools';
+import { mergeAll } from 'ramda';
 
-import { userResolvers } from './features/user';
+import {
+  schema as userSchema,
+  resolvers as userResolvers
+} from './features/user';
 
 
-const typeDefs = `
-  type Channel {
-    id: ID!
-    name: String
-    messages: [Message]!
-  }
+const schema = [...userSchema];
+const resolvers = mergeAll([userResolvers]);
 
-  input MessageInput{
-    channelId: ID!
-    text: String
-  }
+const executableSchema = makeExecutableSchema({
+  typeDefs: schema,
+  resolvers
+});
 
-  type Message {
-    id: ID!
-    text: String
-  }
-
-  type Query {
-    channels: [Channel]
-    channel(id: ID!): Channel
-  }
-
-  type Mutation {
-    addChannel(name: String!): Channel
-    addMessage(message: MessageInput!): Message
-  }
-
-  type Subscription {
-    messageAdded(channelId: ID!): Message
-  }
-`;
-
-const schema = makeExecutableSchema({ typeDefs, resolvers: userResolvers });
-
-export { schema };
+export { executableSchema };

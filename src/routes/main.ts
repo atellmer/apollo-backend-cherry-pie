@@ -14,7 +14,7 @@ import {
   EXPIRATION_TOKEN
 } from '../config';
 import { comparePasswords, protect } from '../features/auth';
-import { schema } from '../schema';
+import { executableSchema } from '../schema';
 
 
 const ROUTES = {
@@ -28,7 +28,7 @@ const ROUTES = {
 const router = Router();
 
 router.use(ROUTES.GRAPHQL, protect(), graphqlExpress({
-  schema
+  schema: executableSchema
 }));
 
 router.use(ROUTES.GRAPHIQL, graphiqlExpress({

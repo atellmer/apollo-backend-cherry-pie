@@ -8,11 +8,11 @@ import * as cors from 'cors';
 import * as passport from 'passport';
 import * as mongoose from 'mongoose';
 
-import { PORT, DB } from './src/config';
-import { configurePassport, validateToken } from './src/features/auth';
-import { router, ROUTES } from './src/routes/main';
-import { schema } from './src/schema';
-import { getUserById } from './src/features/user';
+import { PORT, DB } from './config';
+import { configurePassport, validateToken } from './features/auth';
+import { router, ROUTES } from './routes/main';
+import { executableSchema } from './schema';
+import { getUserById } from './features/user';
 
 
 mongoose.Promise = global.Promise;
@@ -47,7 +47,7 @@ websocketServer.listen(PORT, () => {
   const subscriptionServer = new SubscriptionServer({
     execute,
     subscribe,
-    schema,
+    schema: executableSchema,
     onConnect: (connectionParams, webSocket) => {
       if (connectionParams.authToken) {
         return validateToken(connectionParams.authToken)
